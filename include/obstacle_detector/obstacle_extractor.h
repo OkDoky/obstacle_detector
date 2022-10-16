@@ -36,6 +36,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <math.h>
 #include <tf/transform_listener.h>
 #include <std_srvs/Empty.h>
 #include <sensor_msgs/LaserScan.h>
@@ -49,7 +50,11 @@
 
 namespace obstacle_detector
 {
-
+bool isInRadius(double x_, double y_, const double radius){
+  double c_radius = sqrt(pow(x_,2)+pow(y_,2));
+  if (c_radius > radius) return false;
+  else return true;
+}
 class ObstacleExtractor
 {
 public:
@@ -63,9 +68,12 @@ private:
 
   void initialize() { std_srvs::Empty empt; updateParams(empt.request, empt.response); }
 
-  void processPoints();
-  void groupPoints();
+  void pclProcessPoints();
+  void scanProcessPoints();
+  void scanGroupPoints();
+  void pclGroupPoints();
   void publishObstacles();
+  void publishDebugObstacles();
 
   void detectSegments(const PointSet& point_set);
   void mergeSegments();
@@ -74,6 +82,7 @@ private:
   bool checkSegmentsCollinearity(const Segment& segment, const Segment& s1, const Segment& s2);
 
   void detectCircles();
+  void makeCircles();
   void mergeCircles();
   bool compareCircles(const Circle& c1, const Circle& c2, Circle& merged_circle);
 
@@ -83,6 +92,7 @@ private:
   ros::Subscriber scan_sub_;
   ros::Subscriber pcl_sub_;
   ros::Publisher obstacles_pub_;
+  ros::Publisher debug_detection_pub_;
   ros::ServiceServer params_srv_;
 
   ros::Time stamp_;
@@ -112,6 +122,7 @@ private:
   double p_max_merge_spread_;
   double p_max_circle_radius_;
   double p_radius_enlargement_;
+  double p_detection_radius_;
 
   double p_min_x_limit_;
   double p_max_x_limit_;
