@@ -14,10 +14,10 @@ The package requires [Armadillo C++](http://arma.sourceforge.net) library for co
 -----------------------
 
 1. The nodes and nodelets
-  1.1 The scans_merger 
-  1.2 The obstacle_extractor 
-  1.3 The obstacle_tracker 
-  1.4 The obstacle_publisher
+    1.1 The scans_merger 
+    1.2 The obstacle_extractor 
+    1.3 The obstacle_tracker 
+    1.4 The obstacle_publisher
 2. The messages
 3. Launch files
 4. The displays
@@ -53,6 +53,8 @@ The input laser scans are firstly rectified to incorporate the motion of the sca
 
 The resulting messages contain geometric data described with respect to a specific coordinate frame (e.g. `robot`). Assuming that the coordinate frames attached to two laser scanners are called `front_scanner` and `rear_scanner`, both transformation from `robot` frame to `front_scanner` frame and from `robot` frame to `rear_scanner` frame must be provided. The node allows to artificially restrict measured points to some rectangular region around the `robot` frame as well as to limit the resulting laser scan range. The points falling behind this region will be discarded.
 
+add whole obstacles for detected out for `~debug/detected_obstacles` topic.
+
 Even if only one laser scanner is used, the node can be useful for simple data pre-processing, e.g. rectification, range restriction or recalculation of points to a different coordinate frame. The node uses the following set of local parameters:
 
 * `~active` (`bool`, default: `true`) - active/sleep mode,
@@ -67,6 +69,7 @@ Even if only one laser scanner is used, the node can be useful for simple data p
 * `~max_y_range` (`double`, default: `10.0`) - as above,
 * `~fixed_frame_id` (`string`, default: `map`) - name of the fixed coordinate frame used for scan rectification in time,
 * `~target_frame_id` (`string`, default: `robot`) - name of the coordinate frame used as the origin for the produced laser scan or point cloud.
+* `~detection_radius` (`double`, default: `10.0`) - distance from robot to obstacles
 
 The package comes with Rviz panel for this node.
 
