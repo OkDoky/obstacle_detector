@@ -105,6 +105,7 @@ private:
   double p_process_variance_;
   double p_process_rate_variance_;
   double p_measurement_variance_;
+  double p_vel_threashold_;
 
   std::string p_frame_id_;
 };
