@@ -124,6 +124,17 @@ public:
   const KalmanFilter& getKFy() const { return kf_y_; }
   const KalmanFilter& getKFr() const { return kf_r_; }
 
+  bool hasMoved(double& s_vec, double vel_threshold)
+  {
+    // double scalar_vector;
+    // scalar_vector = hypot(obstacle_.velocity.x, obstacle_.velocity.y);
+    // std::cout << "has moved ? velocity" << scalar_vector << std::endl;
+    // return ((scalar_vector > 0.01) ? true : false);
+
+    s_vec = hypot(obstacle_.velocity.x, obstacle_.velocity.y);
+    return ((s_vec > vel_threshold) ? true : false);
+  }
+
 private:
   void initKF() {
     kf_x_.A(0, 1) = s_sampling_time_;
