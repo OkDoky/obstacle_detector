@@ -159,7 +159,7 @@ void ObstacleExtractor::scanCallback(const sensor_msgs::LaserScan::ConstPtr scan
   scanProcessPoints();
   end_t = ros::Time::now();
   t_diff = (end_t-start_t).toSec();
-  ROS_WARN("[ObstacleExtractor] cycletime : %f",t_diff);
+  ROS_DEBUG("[ObstacleExtractor] cycletime : %f",t_diff);
 }
 
 void ObstacleExtractor::pclCallback(const sensor_msgs::PointCloud::ConstPtr pcl_msg) {
