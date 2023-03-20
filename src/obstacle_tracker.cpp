@@ -59,6 +59,7 @@ ObstacleTracker::~ObstacleTracker() {
   nh_local_.deleteParam("process_variance");
   nh_local_.deleteParam("process_rate_variance");
   nh_local_.deleteParam("measurement_variance");
+  nh_local_.deleteParam("dynamic_obstacle_velocity_threashold");
 
   nh_local_.deleteParam("frame_id");
 }
@@ -79,6 +80,7 @@ bool ObstacleTracker::updateParams(std_srvs::Empty::Request &req, std_srvs::Empt
   nh_local_.param<double>("process_variance", p_process_variance_, 0.01);
   nh_local_.param<double>("process_rate_variance", p_process_rate_variance_, 0.1);
   nh_local_.param<double>("measurement_variance", p_measurement_variance_, 1.0);
+  nh_local_.param<double>("dynamic_obstacle_velocity_threashold", p_vel_threashold_, 0.01);
 
   nh_local_.param<string>("frame_id", p_frame_id_, string("map"));
   obstacles_.header.frame_id = p_frame_id_;
@@ -456,7 +458,13 @@ void ObstacleTracker::fissureObstacle(const vector<int>& fission_indices, const 
 void ObstacleTracker::updateObstacles() {
   for (int i = 0; i < tracked_obstacles_.size(); ++i) {
     if (!tracked_obstacles_[i].hasFaded())
+    {
       tracked_obstacles_[i].updateState();
+      double s_vec = 0.0;
+
+      if (!tracked_obstacles_[i].hasMoved(s_vec, p_vel_threashold_))
+        tracked_obstacles_.erase(tracked_obstacles_.begin() + i--);
+    }
     else
       tracked_obstacles_.erase(tracked_obstacles_.begin() + i--);
   }
