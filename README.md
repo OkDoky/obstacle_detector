@@ -152,6 +152,7 @@ The node works in a synchronous manner with the default rate of 100 Hz. If detec
 * `~process_rate_variance` (`double`, default `0.1`) - variance of rate of change of obstacles values (parameter of Kalman Filter),
 * `~measurement_variance` (`double`, default `1.0`) - variance of measured obstacles values (parameter of Kalman Filter),
 * `~frame_id` (`string`, default: `map`) - name of the coordinate frame in which the obstacles are described,
+* `~dynamic_obstacle_velocity_threashold` (`double`, default: `0.005`) - threashold for check dynamic obstacle or static obstacle,
 
 The package comes with Rviz panel for this node.
 
