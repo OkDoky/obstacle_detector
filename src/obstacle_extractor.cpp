@@ -103,6 +103,8 @@ bool ObstacleExtractor::updateParams(std_srvs::Empty::Request &req, std_srvs::Em
   nh_local_.param<double>("min_y_limit", p_min_y_limit_, -10.0);
   nh_local_.param<double>("max_y_limit", p_max_y_limit_,  10.0);
   nh_local_.param<double>("detection_radius", p_detection_radius_, 10.0);
+  nh_local_.param<double>("min_distance_points", p_min_distance_points_, 0.005);
+  
 
   nh_local_.param<string>("frame_id", p_frame_id_, "map");
 
@@ -149,12 +151,18 @@ void ObstacleExtractor::scanCallback(const sensor_msgs::LaserScan::ConstPtr scan
 
   double phi = scan_msg->angle_min;
 
+  std::vector<Point> points;
   for (const float r : scan_msg->ranges) {
     if (r >= scan_msg->range_min && r <= scan_msg->range_max)
-      input_points_.push_back(Point::fromPoolarCoords(r, phi));
-
+      points.push_back(Point::fromPoolarCoords(r, phi));
     phi += scan_msg->angle_increment;
   }
+
+  // Assuming you have an instance of KDTree called kdTree
+  input_points_kd_tree_.build(points);
+  input_points_kd_tree_.inOrderTraversal(input_points_kd_tree_.root, input_points_);
+
+  // Add the point set to your desired data structure or use it accordingly
 
   scanProcessPoints();
   end_t = ros::Time::now();
@@ -168,9 +176,15 @@ void ObstacleExtractor::pclCallback(const sensor_msgs::PointCloud::ConstPtr pcl_
   start_t = ros::Time::now();
   base_frame_id_ = pcl_msg->header.frame_id;
   stamp_ = pcl_msg->header.stamp;
+  
+  std::vector<Point> points;
+  for (const geometry_msgs::Point32& point : pcl_msg->points) {
+    points.push_back(Point(point.x, point.y));
+  }
 
-  for (const geometry_msgs::Point32& point : pcl_msg->points)
-    input_points_.push_back(Point(point.x, point.y));
+  // Assuming you have an instance of KDTree called kdTree
+  input_points_kd_tree_.build(points);
+  input_points_kd_tree_.inOrderTraversal(input_points_kd_tree_.root, input_points_);
 
   pclProcessPoints();
 
@@ -179,6 +193,7 @@ void ObstacleExtractor::pclCallback(const sensor_msgs::PointCloud::ConstPtr pcl_
   t_diff = (end_t-start_t).toSec();
   ROS_DEBUG("[ObstacleExtractor] cycletime : %f",t_diff);
 }
+
 void ObstacleExtractor::scanProcessPoints() {
   segments_.clear();
   circles_.clear();
@@ -189,6 +204,7 @@ void ObstacleExtractor::scanProcessPoints() {
   mergeCircles();
   publishObstacles();
 
+  input_points_kd_tree_.clear();
   input_points_.clear();
 }
 
@@ -202,6 +218,7 @@ void ObstacleExtractor::pclProcessPoints() {
   mergeCircles();
   publishObstacles();
 
+  input_points_kd_tree_.clear();
   input_points_.clear();
 }
 
@@ -289,6 +306,10 @@ void ObstacleExtractor::pclGroupPoints() {
 
 void ObstacleExtractor::detectSegments(const PointSet& point_set) {
   if (point_set.num_points < p_min_group_points_)
+    return;
+  Point dp = *point_set.begin - *point_set.end;
+  double dr = hypot(dp.x,dp.y);
+  if (dr < p_min_distance_points_)
     return;
   Segment segment(*point_set.begin, *point_set.end);  // Use Iterative End Point Fit
 

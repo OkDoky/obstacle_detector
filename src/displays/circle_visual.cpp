@@ -45,6 +45,7 @@ CircleVisual::CircleVisual(Ogre::SceneManager* scene_manager, Ogre::SceneNode* p
 
   obstacle_.reset(new rviz::Shape(rviz::Shape::Cylinder, scene_manager_, frame_node_1_));
   margin_.reset(new rviz::Shape(rviz::Shape::Cylinder, scene_manager_, frame_node_2_));
+  velocity_.reset(new rviz::Arrow(scene_manager_, frame_node_1_));
 }
 
 CircleVisual::~CircleVisual() {
@@ -68,8 +69,22 @@ void CircleVisual::setData(const obstacle_detector::CircleObstacle& circle) {
   Ogre::Vector3 dir(Ogre::Real(1.0), Ogre::Real(0.0), Ogre::Real(0.0));
   Ogre::Radian angle(Ogre::Real(M_PI_2));
   Ogre::Quaternion q(angle, dir);
+
+
+  // Set velocity arrow properties
+  Ogre::Vector3 velocity(circle.velocity.x, circle.velocity.y, 0.0);
+  Ogre::Vector3 arrow_position = pos + 0.5 * velocity; // Adjust the factor (0.5) to control the arrow's position relative to the obstacle
+  velocity_->setPosition(arrow_position);
+  velocity_->setDirection(velocity);
+
+  double arrow_length = velocity.length();
+  double arrow_head_length = 0.1 * arrow_length; // Adjust the factor (0.1) to control the arrow's head length relative to the arrow length
+  double arrow_shaft_diameter = 0.05; // Adjust this value to control the arrow's shaft diameter
+  double arrow_head_diameter = 0.15; // Adjust this value to control the arrow's head diameter
+
   obstacle_->setOrientation(q);
   margin_->setOrientation(q);
+  velocity_->set(arrow_length, arrow_head_length, arrow_shaft_diameter, arrow_head_diameter);
 }
 
 void CircleVisual::setFramePosition(const Ogre::Vector3& position) {
