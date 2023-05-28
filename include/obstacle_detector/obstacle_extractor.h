@@ -46,7 +46,8 @@
 #include "obstacle_detector/utilities/point.h"
 #include "obstacle_detector/utilities/segment.h"
 #include "obstacle_detector/utilities/circle.h"
-#include "obstacle_detector/utilities/point_set.h"
+// #include "obstacle_detector/utilities/point_set.h"
+#include "obstacle_detector/utilities/point_set_kd_tree.h"
 
 namespace obstacle_detector
 {
@@ -99,9 +100,10 @@ private:
   std::string base_frame_id_;
   tf::TransformListener tf_listener_;
 
-  std::list<Point> input_points_;
+  std::vector<Point> input_points_;
   std::list<Segment> segments_;
   std::list<Circle> circles_;
+  KDTree input_points_kd_tree_;
 
   // Parameters
   bool p_active_;
@@ -123,6 +125,7 @@ private:
   double p_max_circle_radius_;
   double p_radius_enlargement_;
   double p_detection_radius_;
+  double p_min_distance_points_;
 
   double p_min_x_limit_;
   double p_max_x_limit_;
