@@ -227,3 +227,6 @@ For better visual effects, appropriate Rviz display for `Obstacles` messages was
 Author:
 _Mateusz Przybyla_
 
+update 
+* 2023.05.08
+  - visualize vector arror in circleObstacle type
