@@ -38,7 +38,8 @@
 #include <vector>
 
 #include "obstacle_detector/utilities/point.h"
-#include "obstacle_detector/utilities/point_set.h"
+// #include "obstacle_detector/utilities/point_set.h"
+#include "obstacle_detector/utilities/point_set_kd_tree.h"
 
 namespace obstacle_detector
 {
