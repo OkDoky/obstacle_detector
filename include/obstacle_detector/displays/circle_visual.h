@@ -43,6 +43,7 @@
 #include <OGRE/OgreSceneManager.h>
 
 #include <rviz/ogre_helpers/shape.h>
+#include <rviz/ogre_helpers/arrow.h>
 #endif
 
 namespace obstacles_display
@@ -64,6 +65,7 @@ public:
 private:
   boost::shared_ptr<rviz::Shape> obstacle_;
   boost::shared_ptr<rviz::Shape> margin_;
+  boost::shared_ptr<rviz::Arrow> velocity_;
 
   Ogre::SceneNode* frame_node_1_;
   Ogre::SceneNode* frame_node_2_;
